@@ -1,6 +1,6 @@
 use super::{param_header::*, param_type::*, *};
 
-use rand::Rng;
+use crate::util::os_fill;
 
 #[derive(Default, Debug, Clone, PartialEq)]
 pub(crate) struct ParamStateCookie {
@@ -51,7 +51,7 @@ impl ParamStateCookie {
     pub(crate) fn new() -> Self {
         let mut cookie = BytesMut::new();
         cookie.resize(32, 0);
-        rand::rng().fill(cookie.as_mut());
+        os_fill(cookie.as_mut());
 
         ParamStateCookie {
             cookie: cookie.freeze(),

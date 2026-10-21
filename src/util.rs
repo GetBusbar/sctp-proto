@@ -65,7 +65,7 @@ impl RandomAssociationIdGenerator {
 
 impl AssociationIdGenerator for RandomAssociationIdGenerator {
     fn generate_aid(&mut self) -> AssociationId {
-        rand::random::<u32>()
+        os_random::<u32>()
     }
 
     fn aid_lifetime(&self) -> Option<Duration> {
@@ -269,6 +269,22 @@ pub(crate) fn sna16gte(i1: u16, i2: u16) -> bool {
 #[inline]
 pub(crate) fn sna16eq(i1: u16, i2: u16) -> bool {
     i1 == i2
+}
+
+/// A random value drawn from the OS (`OsRng`), never from a per-thread generator: nothing random
+/// is kept outside the endpoint or association that asked for it.
+pub(crate) fn os_random<T>() -> T
+where
+    rand::distr::StandardUniform: rand::distr::Distribution<T>,
+{
+    use rand::{Rng, TryRngCore};
+    rand::rngs::OsRng.unwrap_err().random()
+}
+
+/// Fill `dest` from the OS (`OsRng`), never from a per-thread generator.
+pub(crate) fn os_fill(dest: &mut [u8]) {
+    use rand::{Rng, TryRngCore};
+    rand::rngs::OsRng.unwrap_err().fill(dest);
 }
 
 #[cfg(test)]

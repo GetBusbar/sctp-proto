@@ -78,10 +78,8 @@ impl Endpoint {
     ///
     /// Returns `Err` if the configuration is invalid.
     pub fn new(config: Arc<EndpointConfig>, server_config: Option<Arc<ServerConfig>>) -> Self {
-        let rng = {
-            let mut base = rand::rng();
-            StdRng::from_rng(&mut base)
-        };
+        // Seeded from the OS, never from a per-thread generator.
+        let rng = StdRng::from_os_rng();
         Self {
             rng,
             transmits: VecDeque::new(),
